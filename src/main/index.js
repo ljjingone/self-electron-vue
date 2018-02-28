@@ -1,5 +1,9 @@
 import { app, BrowserWindow } from 'electron'
 
+import {sjy, f2} from '../script/sjy.js'
+
+
+f2();
 /**
  * Set `__static` path to static files in production
  * https://simulatedgreg.gitbooks.io/electron-vue/content/en/using-static-assets.html
@@ -22,6 +26,8 @@ function createWindow () {
     useContentSize: true,
     width: 1000
   })
+
+  mainWindow.webContents.openDevTools()
 
   mainWindow.loadURL(winURL)
 
