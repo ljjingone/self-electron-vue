@@ -1,9 +1,4 @@
-import { app, BrowserWindow } from 'electron'
-
-import {sjy, f2} from '../script/sjy.js'
-
-
-f2();
+import { ipcMain,app, BrowserWindow } from 'electron'
 /**
  * Set `__static` path to static files in production
  * https://simulatedgreg.gitbooks.io/electron-vue/content/en/using-static-assets.html
@@ -28,6 +23,30 @@ function createWindow () {
   })
 
   mainWindow.webContents.openDevTools()
+
+
+  // 前端数据接口
+  ipcMain.on('top', (event, arg) => {
+    console.log("mian1" + arg)  // prints "ping"
+    event.sender.send('back1', '上行')//在main process里向web page发出message
+  })
+  ipcMain.on('bot', (event, arg) => {
+    console.log("mian1" + arg)  // prints "ping"
+    event.sender.send('back2', '下行')//在main process里向web page发出message
+  })
+  ipcMain.on('random', (event, arg) => {
+    console.log("mian1" + arg)  // prints "ping"
+    event.sender.send('back3', '随机')//在main process里向web page发出message
+  })
+  ipcMain.on('stop', (event, arg) => {
+    console.log("mian1" + arg)  // prints "ping"
+    event.sender.send('back4', '停止')//在main process里向web page发出message
+  })
+
+
+
+
+
 
   mainWindow.loadURL(winURL)
 
