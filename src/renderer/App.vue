@@ -28,4 +28,5 @@
 
 <style>
   /* CSS */
+  ::selection { background: white; /* WebKit/Blink Browsers */ }
 </style>

@@ -1,5 +1,5 @@
 import { ipcMain,app, BrowserWindow } from 'electron'
-import bot from '../common/js/bot.js'
+import Bot from '../common/js/bot.js'
 /**
  * Set `__static` path to static files in production
  * https://simulatedgreg.gitbooks.io/electron-vue/content/en/using-static-assets.html
@@ -13,6 +13,7 @@ const winURL = process.env.NODE_ENV === 'development'
   ? `http://localhost:9080`
   : `file://${__dirname}/index.html`
 
+
 function createWindow () {
   /**
    * Initial window options
@@ -25,34 +26,32 @@ function createWindow () {
 
   mainWindow.webContents.openDevTools()
 
+  
+  let bot
 
-  // 前端数据接口
-  ipcMain.on('top', (event, arg) => {
-    const aa=new bot(arg.fun,arg.symbol,arg.apiKey,arg.secret);
-    console.log(aa.trade) 
-    console.log("mian1" + arg.fun)  // prints "ping"
-    event.sender.send('back1', aa.trade)//在main process里向web page发出message
-  })
-  ipcMain.on('bot', (event, arg) => {
-    console.log("mian1" + arg)  // prints "ping"
-    event.sender.send('back2', '下行')//在main process里向web page发出message
-  })
   ipcMain.on('random', (event, arg) => {
-    console.log("mian1" + arg)  // prints "ping"
-    event.sender.send('back3', '随机')//在main process里向web page发出message
+    event.sender.send('log', 'main监听到随机交易点击事件')
+    const params = {
+      createWindow: event.sender,
+      apiKey: '183a2ec2-b575e97b-1b7b059c-c2443',
+      secret: '42a3edba-64cd725a-0eeffc05-1cd10',
+    }
+    bot = new Bot(params);
+    event.sender.send('log', '机器人创建成功')
+    // bot.generateRandomOrders();
+    bot.generateRandomOrders()
+    // event.sender.send('back3', '随机')//在main process里向web page发出message
   })
+
   //停止
   ipcMain.on('stop', (event, arg) => {
-    const aa=new bot(arg.fun,arg.symbol,arg.apiKey,arg.secret);
-    console.log(aa.stop())
-    console.log("mian1" + aa.stop())  // prints "ping"
-    event.sender.send('back4', '停止')//在main process里向web page发出message
+    if(!bot) {
+      event.sender.send('log', '机器人尚未创建')
+      return;
+    }
+    bot.stop(event.sender)
+    
   })
-
-
-
-
-
 
   mainWindow.loadURL(winURL)
 

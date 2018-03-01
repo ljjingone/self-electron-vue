@@ -1,125 +1,155 @@
-﻿let ccxt = require('ccxt');  //https://github.com/ccxt/ccxt/wiki/Manual
-import { ipcMain } from 'electron'
-function doSomething(count) {
-  console.log("第"+count+"次执行")
-}
+﻿let ccxt = require('ccxt'); //https://github.com/ccxt/ccxt/wiki/Manual
 
-class Bot {
-  constructor() {
-    this.exchange = 'huobipro';       //交易所
-    this.symbol = 'OCN/ETH';    //交易类型
-    this.apiKey = '183a2ec2-b575e97b-1b7b059c-c2443';
-    this.secret = '42a3edba-64cd725a-0eeffc05-1cd10';
-    this.running = false;
-    this.count = 0;
-    this.orders = [];
+export default class Bot {
+  /**
+   * 交易机器人
+   * 
+   * @param {String} createWindow 创造机器人的window 
+   * @param {String} exchange 交易所， 默认：'huobipro'
+   * @param {String} symbol 交易市场， 默认：'OCN/ETH'
+   * @param {String} apiKey 
+   * @param {String} secret 
+   */
+  constructor({createWindow, exchange = 'huobipro', symbol = 'OCN/ETH', apiKey, secret}) {
+    if(!createWindow){
+      throw new Error('Argument error')
+    }
+    this.createWindow = createWindow;
+    this.exchange = exchange;
+    this.symbol = symbol;
+    this.apiKey = apiKey;
+    this.secret = secret;
+
     this.exchange = new ccxt[this.exchange]({
       'apiKey': this.apiKey,
       'secret': this.secret
     });
+
+    this.count = 1;
+    this.orders = [];
+    this.running = false;
+
     this.tradeTimmer = null;
-    this.rand=1000;
   }
 
-  raisePrice(){
-
-  }
-
-  dropPrise() {
-    return "jjjjjjj";
-  }
-
-  async GenerateRandomOrder() {
+  generateRandomOrders({bidNarrowVolume = 1, askNarrowVolume = 1, narrowWaitTime = 5, maxVolume = 3, minVolume = 1} = {}) {
+    this.createWindow.send('log', '######开始在买1卖1中间随机挂单######')
     this.running = true;
-    await this.trade();
+    this.makeRandomOrder(bidNarrowVolume, askNarrowVolume, narrowWaitTime, maxVolume, minVolume)
   }
 
-  async trade() {
-    let _this = this;
-    
-      let _data=new Date()
-      _this.tradeTimmer=setInterval( () => {
-        this.rand= Math.random()*1000+1000;
-        _this.count = _this.count + 1;
-        console.log((new Date()-_data)+"第"+_this.count+"次执行")
-        
-        
-      }, this.rand)
-    
-    return("成功运行")
-  }
-
-  async order(){
-    // 获取卖1买1
-    let {ask, askVolume, bid, bidVolume} = await this.exchange.fetch_ticker(this.symbol);
-    let volume, price, order;
-
-    //扩大价格区间
-    //成交买1
-    if(bidVolume < this.maxVolume){
-      volume = bidVolume.toFixed(2);
-      if(bidVolume < 1.0){
-        bidVolume = '1.00';
+  async makeRandomOrder(bidNarrowVolume, askNarrowVolume, narrowWaitTime, maxVolume, minVolume) {
+    try {
+      if(!this.running){
+        clearTimeout(this.tradeTimmer);
+        this.createWindow.send('log', `######随机挂单停止######`);
+        return;
       }
-      order = await this.buy(bid.toFixed(8), volume);
-    }
-    //成交卖1
-    if(askVolume < this.maxVolume){
-      volume =askVolumeask.toFixed(2);
-      if(askVolume < 1.0){
-        askVolume = '1.00';
+      // 获取卖1买1
+      this.createWindow.send('log', `======开始第${this.count}轮随机挂单======`)
+      let {
+        ask,
+        askVolume,
+        bid,
+        bidVolume
+      } = await this.exchange.fetch_ticker(this.symbol);
+
+      let volume, price;
+
+      //扩大价格区间
+      //成交买1
+      if (bidVolume < bidNarrowVolume) {
+        volume = bidVolume.toFixed(2);
+        if (bidVolume < 1.0) {
+          bidVolume = '1.00';
+        }
+        await this.buy(bid.toFixed(8), volume);
       }
-      await this.sell(ask.toFixed(8), volume);
-    }
+      //成交卖1
+      if (askVolume < askNarrowVolume) {
+        volume = askVolume.toFixed(2);
+        if (askVolume < 1.0) {
+          askVolume = '1.00';
+        }
+        await this.sell(ask.toFixed(8), volume);
+      }
 
-    //区间太小就不交易
-    if(ask - bid < 0.00000002){
-      return
-    }
+      //区间太小就不交易
+      if (ask - bid < 0.00000002) {
+        this.tradeTimmer = setTimeout(() => {
+          this.makeRandomOrder(bidNarrowVolume, askNarrowVolume, narrowWaitTime, maxVolume, minVolume);
+        }, narrowWaitTime * 1000);
+      }
 
-    //在买1卖1中间随机挂单
-    let price = bid +  0.00000001 + (ask - bid - 0.00000002) * Math.random()
-    volume = Math.random() * 30 + 50;
-    await this.sell(price, volume);
-    await this.buy(price, volume);
+      //在买1卖1中间随机挂单
+      price = bid + 0.00000001 + (ask - bid - 0.00000002) * Math.random()
+      volume = Math.random() * (maxVolume - minVolume) + minVolume;
+      await this.sell(price, volume);
+      await this.buy(price, volume);
 
-    if(this.orders.length >= 6){
-      await this.clearOrders();
+      if (this.orders.length >= 6) {
+        this.createWindow.send('log', `======挂单数大于6，清空挂单======`)
+        await this.cancelOrders();
+      }
+      this.createWindow.send('log', `======完成第${this.count}轮随机挂单======`)
+      this.count++;
+      if(this.running){
+        this.tradeTimmer = setTimeout(() => {
+          this.makeRandomOrder(bidNarrowVolume, askNarrowVolume, narrowWaitTime, maxVolume, minVolume);
+        }, Math.random() * 5000 + 2000);
+      }else{
+        clearTimeout(this.tradeTimmer);
+        this.createWindow.send('log', `######随机挂单停止######`);
+      }
+    }catch(e){
+      this.running = false;
+      this.createWindow.send('error', `######随机挂单错误######\n ${e}`)
     }
+    
   }
 
   async buy(price, volume) {
-    if(price > 0.0001) return
-    let order = await this.exchange.create_order(this.symbol, "limit", "buy", volume, price, {'trading_agreement': 'agree'});
-    this.orders.push(order["id"])
+    try {
+      let order = await this.exchange.create_order(this.symbol, "limit", "buy", volume, price, {
+        'trading_agreement': 'agree'
+      });
+      this.createWindow.send('log', `买入挂单成功：价格：${price};数量：${volume}`)
+      this.orders.push(order["id"])
+    } catch (e) {
+      this.running = false;
+      this.createWindow.send('error', `######买入挂单失败：价格：${price};数量：${volume}######\n ${e}`)
+    }
   }
 
   async sell(price, volume) {
-    if(price < 0.0002) return
     try {
-      let order = await this.exchange.create_order(this.symbol, "limit", "sell", volume, price, {'trading_agreement': 'agree'})
+      let order = await this.exchange.create_order(this.symbol, "limit", "sell", volume, price, {
+        'trading_agreement': 'agree'
+      });
+      this.createWindow.send('log', `卖出挂单成功：价格：${price};数量：${volume}`)
       this.orders.push(order["id"])
-    }catch(e) {
-      console.error(e)
+    } catch (e) {
+      this.running = false;
+      this.createWindow.send('error', `######卖出挂单失败：价格：${price};数量：${volume}######\n ${e}`)
     }
   }
 
-  async clearOrders(){
-    for(let id of this.orders){
-      this.exchange.cancel_order(id, this.symbol);
+  async cancelOrders() {
+    try{
+      for (let id of this.orders) {
+        this.exchange.cancel_order(id, this.symbol);
+      }
+      this.orders = [];
+      this.createWindow.send('log', `======清空挂单完成======`)
+    } catch (e) {
+      {e}
     }
-    this.orders = [];
   }
 
   stop() {
     this.running = false;
-    this.count = 0;
-    clearInterval(this.tradeTimmer)
-    return("成功停止")
+    // this.count = 1;
+    // clearInterval(this.tradeTimmer)
+    // this.sender.send('log', '成功停止')
   }
 }
-
-bot.trade()
-
-setTimeout(() => {bot.stop()}, 8000)
-

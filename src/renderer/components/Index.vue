@@ -86,18 +86,27 @@ data() {
     }
 },
 created(){
-    console.log(this.$electron.ipcRenderer.on)
     this.$electron.ipcRenderer.on('back1', (event, arg) => {//根据返回的数据名执行函数
          alert("返回参数：" + arg);
     })
     this.$electron.ipcRenderer.on('back2', (event, arg) => {
          alert("返回参数：" + arg);
     })
-    this.$electron.ipcRenderer.on('back3', (event, arg) => {
+    this.$electron.ipcRenderer.on('ping', (event, arg) => {
          alert("返回参数：" + arg);
     })
     this.$electron.ipcRenderer.on('back4', (event, arg) => {
          alert("返回参数：" + arg);
+    })
+
+    //监听log事件
+    this.$electron.ipcRenderer.on('log', (event, arg) => {
+        console.log(`[${new Date()}]\n ${arg}`)
+    })
+
+    //监听error事件
+    this.$electron.ipcRenderer.on('error', (event, arg) => {
+        console.error(`[${new Date()}]\n ${arg}`)
     })
 
     
@@ -108,32 +117,18 @@ methods: {
         console.log(this.record,"上行");
         this.$electron.ipcRenderer.send('top',this.record)//发送数据
         var _self=this;
-        // var _top1=document.getElementsByClassName("state")[0].scrollTop;
-        // setInterval(function(){
-        //     // this.record.funs.append("1111");
-        //     _self.record.funs.push("iii"+Math.random())
-        //     console.log(_self.record.funs)
-        //     // _top1+=80
-        //     document.getElementsByClassName("state")[0].scrollTop=_self.record.funs.length*100+200;
-        //     if(_self.record.funs.length>20){
-        //         _self.record.funs.splice(0,5)
-        //     }
-        //     // console.log(_top1)
-        //     console.log( _self.record.funs.length)
-
-        // },10000)
     },
     onSubmit1() {
         console.log(this.record,"下行");
         this.$electron.ipcRenderer.send('bot',this.record)
     },
     onSubmit2() {
-        console.log(this.record,"随机");
-        this.$electron.ipcRenderer.send('random',this.record)
+        console.log("点击");
+        this.$electron.ipcRenderer.send('random')
     }, 
     onSubmit3() {
-        console.log(this.record,"停止");
-        this.$electron.ipcRenderer.send('stop',this.record)
+        console.log("停止");
+        this.$electron.ipcRenderer.send('stop')
         this.record.fun=''
     },
     init(){
