@@ -1,7 +1,7 @@
 <template>
   <div id="wrapper">
 
-        <h3 class="head" @click="onSubmit">交易平台刷单</h3>
+        <h3 class="head" >交易平台刷单</h3>
         <el-button type="primary" @click="dialogVisible = true">点击打开 Dialog</el-button>
         <el-dialog
         title="提示"
@@ -61,7 +61,7 @@
             
             <el-form-item label="选择交易平台">
                 <el-select v-model="record.fun"  :disabled="true">
-                    <el-option v-for='funs1 in record.funs' :key="funs1" :label="funs1" :value="funs1" ></el-option>
+                   <el-option v-for='(funs1,index) in record.funs' :key="index" :label="funs1.text" :value="funs1.text" ></el-option>
                     
                 </el-select>
             </el-form-item>
@@ -105,12 +105,12 @@
                   <el-button type="primary" @click="onSubmit3">停止交易</el-button>
             </el-form-item>
         </el-form>
-        <h5>交易数据:</h5>
+        <h4>交易数据:</h4>
         <div  class="state" ref="state1">
             
             <ul v-for="(item1, index) in record.funs" :key='index' class="ul">
                 <li v-if="item1.log" class="log">{{item1.text}}</li>
-                <li v-else class="error" style="color: red">{{item1.text}}</li>
+                <li v-else class="error" >{{item1.text}}</li>
             </ul>
         </div>
   </div>
@@ -124,13 +124,14 @@ data() {
         record:{
             fun:'huobipro',
             funs:[{
-                text:"huobipro",
+                text:"运行成功，交易价格0.1111000交易数量1313131",
                 log:true
             },{
-                text:"huobipro1",
-                log:true
-            },{
-                text:"huobipro2",
+                text:"运行成功，交易价格0.112211000交易数量1313131",
+                log:false
+            },
+            {
+                text:"运行成功，交易价格0.1111000交易数量131223131",
                 log:true
             }],
             symbol:'OCN/ETH',
@@ -168,7 +169,24 @@ created(){
     })
 
     
+    //监听error事件
+    this.$electron.ipcRenderer.on('error', (event, arg) => {
+        console.error(arg)
+    })
     
+    // console.log(this.record)
+    
+    
+},
+mounted(){
+//监听log事件
+    var _top1=this.$refs.state1.scrollTop;
+    this.$electron.ipcRenderer.on('log', (event, arg) => {
+        console.log(arg)
+        this.$refs.state1.scrollTop=this.record.funs.length*100+200;
+        this.record.funs.push({text:arg,log:true})
+    })
+
 },
 methods: {
     onSubmit() {
@@ -176,10 +194,11 @@ methods: {
         // this.$electron.ipcRenderer.send('top',this.record)//发送数据
         var _self=this;
         var _top1=this.$refs.state1.scrollTop;
+        
         setInterval(function(){
             // this.record.funs.append("1111");
-            _self.record.funs.push({text: "iii"+Math.random(), log: true})
-            _self.record.funs.push({text: "iii"+Math.random(), log: false})
+            _self.record.funs.push({text: "iii"+Math.random(), log: true,num:123})
+            _self.record.funs.push({text: "iii"+Math.random(), log: false,num:568})
             // console.log(_self.record.funs)
             // _top1+=80
             _self.$refs.state1.scrollTop=_self.record.funs.length*100+200;
@@ -189,7 +208,7 @@ methods: {
             // console.log(_top1)
             console.log( _self.record.funs.length)
 
-        },1000)
+        },4000)
     },handleClose(done) {
         this.dialogVisible=false;
       }
@@ -200,8 +219,23 @@ methods: {
         this.$electron.ipcRenderer.send('bot',this.record)
     },
     onSubmit2() {
+         let parms={
+            fun:this.record.fun,
+            symbol:this.record.symbol,
+            apiKey:this.record.apiKey,
+            secret:this.record.secret,
+            numPrice:{
+                bot:this.record.numPrice.bot,
+                top:this.record.numPrice.top
+            },
+            notime:this.record.notime,
+            amount:{
+                bot:this.record.amount.bot,
+                top:this.record.amount.top
+            }
+        }
         console.log(this.record,"随机");
-        this.$electron.ipcRenderer.send('random',this.record)
+        this.$electron.ipcRenderer.send('random',parms)
     }, 
     onSubmit3() {
         console.log(this.record,"停止");
@@ -235,6 +269,26 @@ methods: {
     height:200px;
     overflow:auto;
     overflow-x:hidden;
+    border: 1px dashed #aaa;
+    background: #000;
 }
-  
+.state ul li{
+    list-style: none;
+    border-left: 10px solid rgb(20, 235, 38);
+    padding-left: 10px;
+    color: #fff;
+}
+.state ul li span:nth-child(1){
+    margin: 0 5px;
+    color: aqua
+}
+ .state ul li span:nth-child(2){
+    margin: 0 5px;
+    color: blueviolet
+} 
+.state ul li.error{
+    border-left: 10px solid rgb(241, 7, 7);
+    padding-left: 10px;
+    color: rgb(231, 22, 186);
+}
 </style>
