@@ -1,10 +1,10 @@
 ﻿let ccxt = require('ccxt');  //https://github.com/ccxt/ccxt/wiki/Manual
 import { ipcMain } from 'electron'
-function doSomething(count) {
-  console.log("第"+count+"次执行")
-}
+// function doSomething(count) {
+//   console.log("第"+count+"次执行")
+// }
 
-class Bot {
+export default class Bot {
   constructor() {
     this.exchange = 'huobipro';       //交易所
     this.symbol = 'OCN/ETH';    //交易类型
@@ -78,7 +78,7 @@ class Bot {
     }
 
     //在买1卖1中间随机挂单
-    let price = bid +  0.00000001 + (ask - bid - 0.00000002) * Math.random()
+    price = bid +  0.00000001 + (ask - bid - 0.00000002) * Math.random()
     volume = Math.random() * 30 + 50;
     await this.sell(price, volume);
     await this.buy(price, volume);
@@ -111,15 +111,28 @@ class Bot {
     this.orders = [];
   }
 
+  async kk(sender){
+    
+        sender.send('back4', '停止')
+    
+    
+  
+   
+  }
+
   stop() {
     this.running = false;
     this.count = 0;
     clearInterval(this.tradeTimmer)
     return("成功停止")
+
+
+
   }
+  
 }
 
-bot.trade()
+// bot.trade()
 
-setTimeout(() => {bot.stop()}, 8000)
+// setTimeout(() => {bot.stop()}, 8000)
 
