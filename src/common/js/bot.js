@@ -1,4 +1,4 @@
-﻿let ccxt = require('ccxt'); //https://github.com/ccxt/ccxt/wiki/Manual
+﻿﻿let ccxt = require('ccxt'); //https://github.com/ccxt/ccxt/wiki/Manual
 
 export default class Bot {
   /**
@@ -32,7 +32,15 @@ export default class Bot {
     this.tradeTimmer = null;
   }
 
-  generateRandomOrders({bidNarrowVolume = 1, askNarrowVolume = 1, narrowWaitTime = 5, maxVolume = 3, minVolume = 1} = {}) {
+  /**
+   * 
+   * @param {Number} bidNarrowVolume 
+   * @param {Number} askNarrowVolume 
+   * @param {Number} narrowWaitTime 
+   * @param {Number} maxVolume 
+   * @param {Number} minVolume 
+   */
+  generateRandomOrders(bidNarrowVolume = 1, askNarrowVolume = 1, narrowWaitTime = 5, maxVolume = 3, minVolume = 1) {
     this.createWindow.send('log', '######开始在买1卖1中间随机挂单######')
     this.running = true;
     this.makeRandomOrder(bidNarrowVolume, askNarrowVolume, narrowWaitTime, maxVolume, minVolume)
@@ -146,10 +154,20 @@ export default class Bot {
     }
   }
 
+  async kk(sender){
+    
+        sender.send('back4', '停止')
+    
+    
+  
+   
+  }
+
   stop() {
     this.running = false;
     // this.count = 1;
     // clearInterval(this.tradeTimmer)
     // this.sender.send('log', '成功停止')
   }
+  
 }

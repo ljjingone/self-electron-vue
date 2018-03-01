@@ -30,17 +30,13 @@ function createWindow () {
   let bot
 
   ipcMain.on('random', (event, arg) => {
-    event.sender.send('log', 'main监听到随机交易点击事件')
     const params = {
       createWindow: event.sender,
-      apiKey: '183a2ec2-b575e97b-1b7b059c-c2443',
-      secret: '42a3edba-64cd725a-0eeffc05-1cd10',
+      apiKey: arg.constructorParams.apiKey,
+      secret: arg.constructorParams.secret,
     }
     bot = new Bot(params);
-    event.sender.send('log', '机器人创建成功')
-    // bot.generateRandomOrders();
-    bot.generateRandomOrders()
-    // event.sender.send('back3', '随机')//在main process里向web page发出message
+    bot.generateRandomOrders(...arg.randomParams)
   })
 
   //停止
