@@ -99,8 +99,8 @@
                 <el-input v-model="record.spacetime" placeholder=""></el-input>
             </el-form-item>
             <el-form-item>
-                <el-button type="primary" @click="onSubmit">上行启动</el-button>
-                 <el-button type="primary" @click="onSubmit1">下行启动</el-button>
+                <!-- <el-button type="primary" @click="onSubmit">上行启动</el-button>
+                 <el-button type="primary" @click="onSubmit1">下行启动</el-button> -->
                  <el-button type="primary" @click="onSubmit2">随机交易</el-button>
                   <el-button type="primary" @click="onSubmit3">停止交易</el-button>
             </el-form-item>
