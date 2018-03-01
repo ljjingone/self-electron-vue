@@ -1,9 +1,6 @@
 <template>
   <div id="app">
-    <button @click="handleCLick">button</button>
-    <p>{{output}}</p>
-    <button @click="handleCLick2">button</button>
-    <p>{{output2}}</p>
+    <router-view></router-view>
   </div>
 </template>
 

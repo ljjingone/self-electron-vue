@@ -1,4 +1,5 @@
 import { ipcMain,app, BrowserWindow } from 'electron'
+import bot from '../common/js/bot.js'
 /**
  * Set `__static` path to static files in production
  * https://simulatedgreg.gitbooks.io/electron-vue/content/en/using-static-assets.html
@@ -27,8 +28,10 @@ function createWindow () {
 
   // 前端数据接口
   ipcMain.on('top', (event, arg) => {
-    console.log("mian1" + arg)  // prints "ping"
-    event.sender.send('back1', '上行')//在main process里向web page发出message
+    const aa=new bot(arg.fun,arg.symbol,arg.apiKey,arg.secret);
+    console.log(aa.trade) 
+    console.log("mian1" + arg.fun)  // prints "ping"
+    event.sender.send('back1', aa.trade)//在main process里向web page发出message
   })
   ipcMain.on('bot', (event, arg) => {
     console.log("mian1" + arg)  // prints "ping"
@@ -38,8 +41,11 @@ function createWindow () {
     console.log("mian1" + arg)  // prints "ping"
     event.sender.send('back3', '随机')//在main process里向web page发出message
   })
+  //停止
   ipcMain.on('stop', (event, arg) => {
-    console.log("mian1" + arg)  // prints "ping"
+    const aa=new bot(arg.fun,arg.symbol,arg.apiKey,arg.secret);
+    console.log(aa.stop())
+    console.log("mian1" + aa.stop())  // prints "ping"
     event.sender.send('back4', '停止')//在main process里向web page发出message
   })
 

@@ -60,7 +60,6 @@
 </template>
 
 <script>
-import EventEmitter from 'vue-electron'
 
 export default {
 data() {
@@ -110,19 +109,19 @@ methods: {
         this.$electron.ipcRenderer.send('top',this.record)//发送数据
         var _self=this;
         // var _top1=document.getElementsByClassName("state")[0].scrollTop;
-        setInterval(function(){
-            // this.record.funs.append("1111");
-            _self.record.funs.push("iii"+Math.random())
-            console.log(_self.record.funs)
-            // _top1+=80
-            document.getElementsByClassName("state")[0].scrollTop=_self.record.funs.length*100+200;
-            if(_self.record.funs.length>20){
-                _self.record.funs.splice(0,5)
-            }
-            // console.log(_top1)
-            console.log( _self.record.funs.length)
+        // setInterval(function(){
+        //     // this.record.funs.append("1111");
+        //     _self.record.funs.push("iii"+Math.random())
+        //     console.log(_self.record.funs)
+        //     // _top1+=80
+        //     document.getElementsByClassName("state")[0].scrollTop=_self.record.funs.length*100+200;
+        //     if(_self.record.funs.length>20){
+        //         _self.record.funs.splice(0,5)
+        //     }
+        //     // console.log(_top1)
+        //     console.log( _self.record.funs.length)
 
-        },1000)
+        // },10000)
     },
     onSubmit1() {
         console.log(this.record,"下行");

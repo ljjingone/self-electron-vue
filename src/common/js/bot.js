@@ -17,6 +17,7 @@ class Bot {
       'secret': this.secret
     });
     this.tradeTimmer = null;
+    this.rand=1000;
   }
 
   raisePrice(){
@@ -24,7 +25,7 @@ class Bot {
   }
 
   dropPrise() {
-
+    return "jjjjjjj";
   }
 
   async GenerateRandomOrder() {
@@ -33,25 +34,32 @@ class Bot {
   }
 
   async trade() {
+    let _this = this;
     
-    this. tradeTimmer = setTimeout(() => {
-      if(!this.running){
-        this.count = 0;
-        return;
-      }
-      this.count = this.count + 1;
-      console.log("第"+this.count+"次执行")
-    }, 10)
+      let _data=new Date()
+      _this.tradeTimmer=setInterval( () => {
+        this.rand= Math.random()*1000+1000;
+        _this.count = _this.count + 1;
+        console.log((new Date()-_data)+"第"+_this.count+"次执行")
+        
+        
+      }, this.rand)
+    
+    return("成功运行")
   }
 
   stop() {
     this.running = false;
     this.count = 0;
+    clearInterval(this.tradeTimmer)
+    return("成功停止")
   }
 }
 
+
+
 let bot = new Bot();
 
-bot.GenerateRandomOrder()
+bot.trade()
 
-setTimeout(bot.stop(), 5000)
+setTimeout(() => {bot.stop()}, 8000)
