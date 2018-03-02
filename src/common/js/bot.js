@@ -1,4 +1,4 @@
-﻿﻿let ccxt = require('ccxt'); //https://github.com/ccxt/ccxt/wiki/Manual
+﻿let ccxt = require('ccxt'); //https://github.com/ccxt/ccxt/wiki/Manual
 
 export default class Bot {
   /**
@@ -84,16 +84,18 @@ export default class Bot {
 
       //区间太小就不交易
       if (ask - bid < 0.00000002) {
+        this.createWindow.send('log', `=====区间太小,终止第${this.count}轮随机挂单======`)
         this.tradeTimmer = setTimeout(() => {
           this.makeRandomOrder(bidNarrowVolume, askNarrowVolume, narrowWaitTime, maxVolume, minVolume);
         }, narrowWaitTime * 1000);
+        return; 
       }
 
       //在买1卖1中间随机挂单
       price = bid + 0.00000001 + (ask - bid - 0.00000002) * Math.random()
       volume = Math.random() * (maxVolume - minVolume) + minVolume;
-      await this.sell(price, volume);
-      await this.buy(price, volume);
+      await this.sell(price.toFixed(8), volume.toFixed(2));
+      await this.buy(price.toFixed(8), volume.toFixed(2));
 
       if (this.orders.length >= 6) {
         this.createWindow.send('log', `======挂单数大于6，清空挂单======`)
@@ -110,7 +112,7 @@ export default class Bot {
         this.createWindow.send('log', `######随机挂单停止######`);
       }
     }catch(e){
-      this.running = false;
+      // this.running = false;
       this.createWindow.send('error', `######随机挂单错误######\n ${e}`)
     }
     
@@ -124,7 +126,7 @@ export default class Bot {
       this.createWindow.send('log', `买入挂单成功：价格：${price};数量：${volume}`)
       this.orders.push(order["id"])
     } catch (e) {
-      this.running = false;
+      // this.running = false;
       this.createWindow.send('error', `######买入挂单失败：价格：${price};数量：${volume}######\n ${e}`)
     }
   }
@@ -137,7 +139,7 @@ export default class Bot {
       this.createWindow.send('log', `卖出挂单成功：价格：${price};数量：${volume}`)
       this.orders.push(order["id"])
     } catch (e) {
-      this.running = false;
+      // this.running = false;
       this.createWindow.send('error', `######卖出挂单失败：价格：${price};数量：${volume}######\n ${e}`)
     }
   }

@@ -32,11 +32,12 @@ function createWindow () {
   ipcMain.on('random', (event, arg) => {
     const params = {
       createWindow: event.sender,
+      exchange: arg.constructorParams.fun,
       apiKey: arg.constructorParams.apiKey,
       secret: arg.constructorParams.secret,
     }
     bot = new Bot(params);
-    bot.generateRandomOrders(...arg.randomParams)
+    bot.generateRandomOrders(arg.randomParams.bidNarrowVolume,arg.randomParams.askNarrowVolume,arg.randomParams.bidNarrowVolume,arg.randomParams.maxVolume,arg.randomParams.minVolume)
   })
 
   //停止

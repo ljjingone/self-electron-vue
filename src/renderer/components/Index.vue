@@ -2,13 +2,14 @@
   <div id="wrapper">
 
         <h3 class="head" >交易平台刷单</h3>
-        <el-button type="primary" @click="dialogVisible = true">点击打开 Dialog</el-button>
+         <!-- 开始form -->
+        <!-- <el-button type="primary" @click="dialogVisible = true">点击打开 Dialog</el-button>
         <el-dialog
         title="提示"
         :visible.sync="dialogVisible"
         width="80%"
         :before-close="handleClose">
-        <!-- 开始form -->
+       
             <el-form  :model="record"  label-width="180px" class="demo-ruleForm" >
             
                 <el-form-item label="选择交易平台">
@@ -55,15 +56,17 @@
                     
                 </el-form-item>
             </el-form>
+        
+        </el-dialog> -->
         <!-- 结束form -->
-        </el-dialog>
-        <el-form  :model="record"  label-width="180px" class="demo-ruleForm" >
+        <el-form  :model="record"  label-width="180px" class="demo-ruleForm"  >
             
             <el-form-item label="选择交易平台">
-                <el-select v-model="record.fun"  :disabled="true">
-                   <el-option v-for='(funs1,index) in record.funs' :key="index" :label="funs1.text" :value="funs1.text" ></el-option>
+                    <el-select v-model="record.fun"  >
+                        <el-option   label="huobipro" value="huobipro" ></el-option>
+                        <el-option   label="hitbtc" value="hitbtc" ></el-option>
+                    </el-select>
                     
-                </el-select>
             </el-form-item>
             <el-form-item label="货币类型">
                 <el-input v-model="record.symbol" placeholder="OCN/ETH" :disabled="true" ></el-input>
@@ -76,11 +79,11 @@
             </el-form-item>
             <el-form-item label="最低最高成交数量/个">
                 <el-col :span="11">
-                <el-input placeholder="50" v-model="record.numPrice.bot" style="width: 100%;"></el-input>
+                <el-input placeholder="50" v-model.number="record.numPrice.bot" style="width: 100%;"></el-input>
                 </el-col>
                 <el-col class="line" :span="2">--</el-col>
                 <el-col :span="11">
-                <el-input placeholder="80" v-model="record.numPrice.top" style="width: 100%;"></el-input>
+                <el-input placeholder="80" v-model.number="record.numPrice.top" style="width: 100%;"></el-input>
                 </el-col>
             </el-form-item>
             <el-form-item label="没有位置时沉睡时间/s">
@@ -88,15 +91,15 @@
             </el-form-item>
             <el-form-item label="成交数量取值范围/个">
                 <el-col :span="11">
-                <el-input placeholder="100" v-model="record.amount.bot" style="width: 100%;"></el-input>
+                <el-input placeholder="100" v-model.number="record.amount.bot" style="width: 100%;"></el-input>
                 </el-col>
                 <el-col class="line" :span="2">--</el-col>
                 <el-col :span="11">
-                <el-input placeholder="150" v-model="record.amount.top" style="width: 100%;"></el-input>
+                <el-input placeholder="150" v-model.number="record.amount.top" style="width: 100%;"></el-input>
                 </el-col>
             </el-form-item>
             <el-form-item label="每场交易完成后间隔时间/s">
-                <el-input v-model="record.spacetime" placeholder=""></el-input>
+                <el-input v-model.number="record.spacetime" placeholder=""></el-input>
             </el-form-item>
             <el-form-item>
                 <!-- <el-button type="primary" @click="onSubmit">上行启动</el-button>
@@ -105,6 +108,7 @@
                   <el-button type="primary" @click="onSubmit3">停止交易</el-button>
             </el-form-item>
         </el-form>
+        <div class="jiaoyi">
         <h4>交易数据:</h4>
         <div  class="state" ref="state1">
             
@@ -112,7 +116,7 @@
                 <li v-if="item1.log" class="log">{{item1.text}}</li>
                 <li v-else class="error" >{{item1.text}}</li>
             </ul>
-        </div>
+        </div></div>
   </div>
 </template>
 
@@ -135,18 +139,20 @@ export default {
         //     log:true
         // }],
         symbol: "OCN/ETH",
-        apiKey: "",
-        secret: "",
+        apiKey: "183a2ec2-b575e97b-1b7b059c-c2443",
+        secret: "42a3edba-64cd725a-0eeffc05-1cd10",
+        // apiKey: "youur  apikey",
+        // secret: "youur  secret",
         numPrice: {
-          bot: "50",
-          top: "80"
+          bot: 1,
+          top: 5
         },
-        notime: "5",
+        notime: 5,
         amount: {
-          bot: "100",
-          top: "150"
+          bot: 1,
+          top: 3
         },
-        spacetime: "6"
+        spacetime: 6
       },
       dialogVisible: false
     };
@@ -185,13 +191,15 @@ export default {
   },
   mounted() {
     //监听log事件
-    var _top1 = this.$refs.state1.scrollTop;
+    
     this.$electron.ipcRenderer.on("log", (event, arg) => {
+        var _top1 = this.$refs.state1.scrollTop;
       console.log(arg);
       this.$refs.state1.scrollTop = this.record.funs.length * 100 + 200;
       this.record.funs.push({ text: arg, log: true });
     });
     this.$electron.ipcRenderer.on("error", (event, arg) => {
+        var _top1 = this.$refs.state1.scrollTop;
       console.error(arg);
       this.$refs.state1.scrollTop = this.record.funs.length * 100 + 200;
       this.record.funs.push({ text: arg, log: false });
@@ -204,27 +212,7 @@ export default {
       var _self = this;
       var _top1 = this.$refs.state1.scrollTop;
 
-      setInterval(function() {
-        // this.record.funs.append("1111");
-        _self.record.funs.push({
-          text: "iii" + Math.random(),
-          log: true,
-          num: 123
-        });
-        _self.record.funs.push({
-          text: "iii" + Math.random(),
-          log: false,
-          num: 568
-        });
-        // console.log(_self.record.funs)
-        // _top1+=80
-        _self.$refs.state1.scrollTop = _self.record.funs.length * 100 + 200;
-        if (_self.record.funs.length > 20) {
-          _self.record.funs.splice(0, 5);
-        }
-        // console.log(_top1)
-        console.log(_self.record.funs.length);
-      }, 4000);
+     
     },
     handleClose(done) {
       this.dialogVisible = false;
@@ -236,15 +224,16 @@ export default {
     onSubmit2() {
       let params = {
         constructorParams: {
-          apiKey: '183a2ec2-b575e97b-1b7b059c-c2443',
-          secret: '42a3edba-64cd725a-0eeffc05-1cd10'
+          fun:this.record.fun,
+          apiKey: this.record.apiKey,
+          secret: this.record.secret
         },
         randomParams: {
-          bidNarrowVolume: 1,
-          askNarrowVolume: 1,
-          narrowWaitTime: 5,
-          maxVolume: 3,
-          minVolume: 1
+          bidNarrowVolume: this.record.numPrice.bot,
+          askNarrowVolume: this.record.numPrice.top,
+          narrowWaitTime: this.record.spacetime,
+          maxVolume: this.record.amount.top,
+          minVolume: this.record.amount.bot
         }
       };
       console.log(this.record, "随机");
@@ -278,11 +267,11 @@ export default {
   border: 1px solid #aaa;
 }
 .state {
-  height: 200px;
+  height: 400px;
   overflow: auto;
   overflow-x: hidden;
   border: 1px dashed #aaa;
-  background: #000;
+  background: #1e1e1e;
 }
 .state ul li {
   list-style: none;
@@ -302,5 +291,18 @@ export default {
   border-left: 10px solid rgb(241, 7, 7);
   padding-left: 10px;
   color: rgb(231, 22, 186);
+}
+.demo-ruleForm{
+    width: 50%;
+    float: left;
+}
+.jiaoyi{
+    box-sizing: border-box;
+    width: 50%;
+    float: left;
+    padding-left:50px; 
+}
+.el-form-item{
+    margin-bottom: 10px; 
 }
 </style>
