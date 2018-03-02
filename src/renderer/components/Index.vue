@@ -225,6 +225,7 @@ export default {
       let params = {
         constructorParams: {
           fun:this.record.fun,
+          symbol:this.record.symbol,
           apiKey: this.record.apiKey,
           secret: this.record.secret
         },

@@ -33,6 +33,7 @@ function createWindow () {
     const params = {
       createWindow: event.sender,
       exchange: arg.constructorParams.fun,
+      symbol: arg.constructorParams.symbol,
       apiKey: arg.constructorParams.apiKey,
       secret: arg.constructorParams.secret,
     }
