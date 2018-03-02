@@ -53,6 +53,7 @@ export default class Bot {
         this.createWindow.send('log', `######随机挂单停止######`);
         return;
       }
+      this.createWindow.send('run', "11");
       // 获取卖1买1
       this.createWindow.send('log', `======开始第${this.count}轮随机挂单======`)
       let {
@@ -116,6 +117,7 @@ export default class Bot {
       this.createWindow.send('error', `######随机挂单错误######\n ${e}`)
     }
     
+
   }
 
   async buy(price, volume) {

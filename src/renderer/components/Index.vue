@@ -154,38 +154,39 @@ export default {
         },
         spacetime: 6
       },
-      dialogVisible: false
+      dialogVisible: false,
+      run:""
     };
   },
   created() {
-    this.$electron.ipcRenderer.on("back1", (event, arg) => {
-      //根据返回的数据名执行函数
-      alert("返回参数：" + arg);
-    });
-    this.$electron.ipcRenderer.on("back2", (event, arg) => {
-      alert("返回参数：" + arg);
-    });
-    this.$electron.ipcRenderer.on("ping", (event, arg) => {
-      alert("返回参数：" + arg);
-    });
-    this.$electron.ipcRenderer.on("back4", (event, arg) => {
-      alert("返回参数：" + arg);
-    });
+    // this.$electron.ipcRenderer.on("back1", (event, arg) => {
+    //   //根据返回的数据名执行函数
+    //   alert("返回参数：" + arg);
+    // });
+    // this.$electron.ipcRenderer.on("back2", (event, arg) => {
+    //   alert("返回参数：" + arg);
+    // });
+    // this.$electron.ipcRenderer.on("ping", (event, arg) => {
+    //   alert("返回参数：" + arg);
+    // });
+    // this.$electron.ipcRenderer.on("back4", (event, arg) => {
+    //   alert("返回参数：" + arg);
+    // });
 
-    //监听log事件
-    this.$electron.ipcRenderer.on("log", (event, arg) => {
-      console.log(`[${new Date()}]\n ${arg}`);
-    });
+    // //监听log事件
+    // this.$electron.ipcRenderer.on("log", (event, arg) => {
+    //   console.log(`[${new Date()}]\n ${arg}`);
+    // });
 
-    //监听error事件
-    this.$electron.ipcRenderer.on("error", (event, arg) => {
-      console.error(`[${new Date()}]\n ${arg}`);
-    });
+    // //监听error事件
+    // this.$electron.ipcRenderer.on("error", (event, arg) => {
+    //   console.error(`[${new Date()}]\n ${arg}`);
+    // });
 
-    //监听error事件
-    this.$electron.ipcRenderer.on("error", (event, arg) => {
-      console.error(arg);
-    });
+    // //监听error事件
+    // this.$electron.ipcRenderer.on("error", (event, arg) => {
+    //   console.error(arg);
+    // });
 
     // console.log(this.record)
   },
@@ -203,6 +204,10 @@ export default {
       console.error(arg);
       this.$refs.state1.scrollTop = this.record.funs.length * 100 + 200;
       this.record.funs.push({ text: arg, log: false });
+    });
+     this.$electron.ipcRenderer.on("run", (event, arg) => {
+       this.run=arg;
+       
     });
   },
   methods: {
@@ -238,12 +243,24 @@ export default {
         }
       };
       console.log(this.record, "随机");
-      this.$electron.ipcRenderer.send("random", params);
+      if(this.record.fun){
+        //   console.log(this.run)
+          if(this.run){
+              alert("程序正在运行")
+          }else{
+                 this.$electron.ipcRenderer.send("random", params);
+          }
+         
+      }else{
+          alert("请选择交易平台")
+      }
+      
     },
     onSubmit3() {
       console.log("停止");
       this.$electron.ipcRenderer.send("stop");
       this.record.fun = "";
+      this.run="";
     },
     init() {
       console.log("click");
