@@ -64,30 +64,35 @@
             <el-form-item label="选择交易平台">
                     <el-select v-model="record.fun"  >
                         <el-option   label="huobipro" value="huobipro" ></el-option>
+                        <el-option   label="geteio" value="geteio" ></el-option>
                         <el-option   label="hitbtc" value="hitbtc" ></el-option>
+                        <el-option   label="cobinhood" value="cobinhood" ></el-option>
+                        <el-option   label="coincheck" value="coincheck" ></el-option>
+                        <el-option   label="chilebit" value="chilebit" ></el-option>
+                        <el-option   label="mixcoins" value="mixcoins" ></el-option>
                     </el-select>
                     
             </el-form-item>
             <el-form-item label="货币类型">
-                <el-input v-model="record.symbol" placeholder="OCN/ETH" :disabled="true" ></el-input>
+                <el-input v-model="record.symbol" placeholder="OCN/ETH"  ></el-input>
             </el-form-item>
-            <el-form-item label="apiKey" prop="apiKey"  :rules="[{ required: true, message: '请输入APIKEY', trigger: 'blur' }]">  
-                <el-input v-model="record.apiKey" placeholder="88186d8e-969cf6a0-e652f8dd-c7a68"></el-input>
+            <el-form-item label="apiKey" prop="apiKey"  :rules="[{ required: true, trigger: 'blur' }]">  
+                <el-input v-model="record.apiKey" placeholder=""></el-input>
             </el-form-item>
-             <el-form-item label="secret" prop="secret"  :rules="[{ required: true, message: '请输入secret', trigger: 'blur' }]">
-                <el-input v-model="record.secret" placeholder="3f79d3fc-46870303-8957f125-f0102"></el-input>
+             <el-form-item label="secret" prop="secret"  :rules="[{ required: true, trigger: 'blur' }]">
+                <el-input v-model="record.secret" placeholder=""></el-input>
             </el-form-item>
-            <el-form-item label="最低最高成交数量/个">
-                <el-col :span="11">
-                <el-input placeholder="50" v-model.number="record.numPrice.bot" style="width: 100%;"></el-input>
-                </el-col>
-                <el-col class="line" :span="2">--</el-col>
-                <el-col :span="11">
-                <el-input placeholder="80" v-model.number="record.numPrice.top" style="width: 100%;"></el-input>
-                </el-col>
+            <el-form-item label="最低成交标准">
+                <el-input placeholder="最低价格的数量小于这个值时最低价格卖出" v-model.number="record.numPrice.bot" style="width: 100%;" ></el-input>
+            </el-form-item>
+            <el-form-item label="最高成交标准">
+                <el-input placeholder="最高价格的数量小于这个值时最高价格买出" v-model.number="record.numPrice.top" style="width: 100%;"></el-input>
             </el-form-item>
             <el-form-item label="没有位置时沉睡时间/s">
                 <el-input v-model="record.notime" placeholder=""></el-input>
+            </el-form-item>
+            <el-form-item label="差价小于多少时停止5s/num">
+                <el-input v-model.number="record.spacePrice" placeholder=""></el-input>
             </el-form-item>
             <el-form-item label="成交数量取值范围/个">
                 <el-col :span="11">
@@ -98,25 +103,29 @@
                 <el-input placeholder="150" v-model.number="record.amount.top" style="width: 100%;"></el-input>
                 </el-col>
             </el-form-item>
-            <el-form-item label="每场交易完成后间隔时间/s">
+            <el-form-item label="交易间隔时间2到多少秒/s">
                 <el-input v-model.number="record.spacetime" placeholder=""></el-input>
             </el-form-item>
-            <el-form-item>
-                <!-- <el-button type="primary" @click="onSubmit">上行启动</el-button>
-                 <el-button type="primary" @click="onSubmit1">下行启动</el-button> -->
-                 <el-button type="primary" @click="onSubmit2">随机交易</el-button>
-                  <el-button type="primary" @click="onSubmit3">停止交易</el-button>
+            <el-form-item >
+                <el-button type="primary" @click="onSubmit2">随机</el-button>
+                <el-button type="primary" @click="onSubmit">上行</el-button>
+                 <el-button type="primary" @click="onSubmit1">下行</el-button>
+                  <el-button type="primary" @click="onSubmit3">停止</el-button>
             </el-form-item>
         </el-form>
         <div class="jiaoyi">
         <h4>交易数据:</h4>
         <div  class="state" ref="state1">
             
-            <ul v-for="(item1, index) in record.funs" :key='index' class="ul">
+            <ul v-for="(item1, index) in record.funs" :key='index' class="ul" >
                 <li v-if="item1.log" class="log">{{item1.text}}</li>
                 <li v-else class="error" >{{item1.text}}</li>
             </ul>
-        </div></div>
+        </div>
+            <div class="buy-sell"> 卖出数量总和：{{this.sellAmount}}<br/>
+                  买入数量总和：{{this.sellAmount}}
+            </div>
+        </div>
   </div>
 </template>
 
@@ -127,104 +136,132 @@ export default {
       record: {
         fun: "huobipro",
         funs: [],
-        //     {
-        //     text:"运行成功，交易价格0.1111000交易数量1313131",
-        //     log:true
-        // },{
-        //     text:"运行成功，交易价格0.112211000交易数量1313131",
-        //     log:false
-        // },
-        // {
-        //     text:"运行成功，交易价格0.1111000交易数量131223131",
-        //     log:true
-        // }],
         symbol: "OCN/ETH",
-        apiKey: "183a2ec2-b575e97b-1b7b059c-c2443",
-        secret: "42a3edba-64cd725a-0eeffc05-1cd10",
+        apiKey: "",
+        secret: "",
         // apiKey: "youur  apikey",
         // secret: "youur  secret",
         numPrice: {
-          bot: 1,
-          top: 5
+          bot: "1",
+          top: "2"
         },
         notime: 5,
         amount: {
           bot: 1,
           top: 3
         },
-        spacetime: 6
+        spacetime: 6,
+        spacePrice:0.00000002
       },
       dialogVisible: false,
-      run:""
+      run:"",
+      sellAmount:"",
+      buyAmount:""
     };
   },
   created() {
-    // this.$electron.ipcRenderer.on("back1", (event, arg) => {
-    //   //根据返回的数据名执行函数
-    //   alert("返回参数：" + arg);
-    // });
-    // this.$electron.ipcRenderer.on("back2", (event, arg) => {
-    //   alert("返回参数：" + arg);
-    // });
-    // this.$electron.ipcRenderer.on("ping", (event, arg) => {
-    //   alert("返回参数：" + arg);
-    // });
-    // this.$electron.ipcRenderer.on("back4", (event, arg) => {
-    //   alert("返回参数：" + arg);
-    // });
-
-    // //监听log事件
-    // this.$electron.ipcRenderer.on("log", (event, arg) => {
-    //   console.log(`[${new Date()}]\n ${arg}`);
-    // });
-
-    // //监听error事件
-    // this.$electron.ipcRenderer.on("error", (event, arg) => {
-    //   console.error(`[${new Date()}]\n ${arg}`);
-    // });
-
-    // //监听error事件
-    // this.$electron.ipcRenderer.on("error", (event, arg) => {
-    //   console.error(arg);
-    // });
-
-    // console.log(this.record)
+    
   },
   mounted() {
+
+   
     //监听log事件
     
     this.$electron.ipcRenderer.on("log", (event, arg) => {
         var _top1 = this.$refs.state1.scrollTop;
-      console.log(arg);
+    //   console.log(arg);
       this.$refs.state1.scrollTop = this.record.funs.length * 100 + 200;
       this.record.funs.push({ text: arg, log: true });
+      if(this.record.funs.length>40){
+          this.record.funs.shift()
+          console.log(this.record.funs.length)
+      }
     });
     this.$electron.ipcRenderer.on("error", (event, arg) => {
         var _top1 = this.$refs.state1.scrollTop;
-      console.error(arg);
+    //   console.error(arg);
       this.$refs.state1.scrollTop = this.record.funs.length * 100 + 200;
       this.record.funs.push({ text: arg, log: false });
+      if(this.record.funs.length>40){
+          this.record.funs.shift()
+          console.log(this.record.funs.length)
+      }
     });
      this.$electron.ipcRenderer.on("run", (event, arg) => {
        this.run=arg;
        
     });
+    this.$electron.ipcRenderer.on("sellAmount", (event, arg) => {
+       this.sellAmount=arg.toFixed(2);
+       
+    });
+    this.$electron.ipcRenderer.on("sellAmount", (event, arg) => {
+       this.buyAmount=arg.toFixed(2);   
+    });
   },
   methods: {
-    onSubmit() {
-      console.log(this.record, "上行");
-      // this.$electron.ipcRenderer.send('top',this.record)//发送数据
-      var _self = this;
-      var _top1 = this.$refs.state1.scrollTop;
+    huoqu(){
 
-     
     },
-    handleClose(done) {
-      this.dialogVisible = false;
+    onSubmit() {
+      let params = {
+        constructorParams: {
+          fun:this.record.fun,
+          symbol:this.record.symbol,
+          apiKey: this.record.apiKey,
+          secret: this.record.secret
+        },
+        randomParams: [
+          this.record.numPrice.bot,
+         this.record.numPrice.top,
+           this.record.spacetime,
+         this.record.amount.top,
+          this.record.amount.bot,
+          this.record.spacePrice
+        ]
+      };
+      console.log(this.record, "上行");
+      if(this.record.fun){
+        //   console.log(this.run)
+          if(this.run){
+              alert("程序正在运行")
+          }else{
+                 this.$electron.ipcRenderer.send("top", params);
+          }
+         
+      }else{
+          alert("请选择交易平台")
+      }
     },
     onSubmit1() {
+     let params = {
+        constructorParams: {
+          fun:this.record.fun,
+          symbol:this.record.symbol,
+          apiKey: this.record.apiKey,
+          secret: this.record.secret
+        },
+         randomParams: [
+          this.record.numPrice.bot,
+         this.record.numPrice.top,
+           this.record.spacetime,
+         this.record.amount.top,
+          this.record.amount.bot,
+          this.record.spacePrice
+        ]
+      };
       console.log(this.record, "下行");
-      this.$electron.ipcRenderer.send("bot", this.record);
+      if(this.record.fun){
+        //   console.log(this.run)
+          if(this.run){
+              alert("程序正在运行")
+          }else{
+                 this.$electron.ipcRenderer.send("bot", params);
+          }
+         
+      }else{
+          alert("请选择交易平台")
+      }
     },
     onSubmit2() {
       let params = {
@@ -234,13 +271,14 @@ export default {
           apiKey: this.record.apiKey,
           secret: this.record.secret
         },
-        randomParams: {
-          bidNarrowVolume: this.record.numPrice.bot,
-          askNarrowVolume: this.record.numPrice.top,
-          narrowWaitTime: this.record.spacetime,
-          maxVolume: this.record.amount.top,
-          minVolume: this.record.amount.bot
-        }
+         randomParams: [
+          this.record.numPrice.bot,
+         this.record.numPrice.top,
+           this.record.spacetime,
+         this.record.amount.top,
+          this.record.amount.bot,
+          this.record.spacePrice
+        ]
       };
       console.log(this.record, "随机");
       if(this.record.fun){
@@ -259,7 +297,7 @@ export default {
     onSubmit3() {
       console.log("停止");
       this.$electron.ipcRenderer.send("stop");
-      this.record.fun = "";
+    //   this.record.fun = "";
       this.run="";
     },
     init() {
@@ -326,4 +364,16 @@ export default {
 h4{
     margin: 10px;
 }
+.el-button+.el-button{
+    margin-left: 5px;
+     
+}
+.buy-sell{
+    padding-top:20px; 
+    padding-left:25px;
+    line-height: 40px; 
+}
+/* .el-button+.el-button:nth-child(4){
+    margin-top:10px; 
+} */
 </style>

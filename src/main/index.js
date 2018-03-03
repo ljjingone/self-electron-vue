@@ -19,9 +19,9 @@ function createWindow () {
    * Initial window options
    */
   mainWindow = new BrowserWindow({
-    height: 600,
+    height: 720,
     useContentSize: true,
-    width: 1000
+    width: 1200
   })
 
   mainWindow.webContents.openDevTools()
@@ -38,9 +38,30 @@ function createWindow () {
       secret: arg.constructorParams.secret,
     }
     bot = new Bot(params);
-    bot.generateRandomOrders(arg.randomParams.bidNarrowVolume,arg.randomParams.askNarrowVolume,arg.randomParams.bidNarrowVolume,arg.randomParams.maxVolume,arg.randomParams.minVolume)
+    bot.generateRandomOrders(...arg.randomParams)
   })
-
+  ipcMain.on('top', (event, arg) => {
+    const params = {
+      createWindow: event.sender,
+      exchange: arg.constructorParams.fun,
+      symbol: arg.constructorParams.symbol,
+      apiKey: arg.constructorParams.apiKey,
+      secret: arg.constructorParams.secret,
+    }
+    bot = new Bot(params);
+    bot.generateRandomOrdersTop(...arg.randomParams)
+  })
+  ipcMain.on('bot', (event, arg) => {
+    const params = {
+      createWindow: event.sender,
+      exchange: arg.constructorParams.fun,
+      symbol: arg.constructorParams.symbol,
+      apiKey: arg.constructorParams.apiKey,
+      secret: arg.constructorParams.secret,
+    }
+    bot = new Bot(params);
+    bot.generateRandomOrdersBot(...arg.randomParams)
+  })
   //停止
   ipcMain.on('stop', (event, arg) => {
     if(!bot) {
