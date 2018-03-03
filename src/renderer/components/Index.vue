@@ -64,9 +64,9 @@
             <el-form-item label="选择交易平台">
                     <el-select v-model="record.fun"  >
                         <el-option   label="huobipro" value="huobipro" ></el-option>
+                        <el-option   label="kucoin" value="kucoin" ></el-option>
                         <el-option   label="geteio" value="geteio" ></el-option>
                         <el-option   label="hitbtc" value="hitbtc" ></el-option>
-                        <el-option   label="cobinhood" value="cobinhood" ></el-option>
                         <el-option   label="coincheck" value="coincheck" ></el-option>
                         <el-option   label="chilebit" value="chilebit" ></el-option>
                         <el-option   label="mixcoins" value="mixcoins" ></el-option>
@@ -77,10 +77,10 @@
                 <el-input v-model="record.symbol" placeholder="OCN/ETH"  ></el-input>
             </el-form-item>
             <el-form-item label="apiKey" prop="apiKey"  :rules="[{ required: true, trigger: 'blur' }]">  
-                <el-input v-model="record.apiKey" placeholder=""></el-input>
+                <el-input v-model="record.apiKey" placeholder="88186d8e-969cf6a0-e652f8dd-c7a68"></el-input>
             </el-form-item>
              <el-form-item label="secret" prop="secret"  :rules="[{ required: true, trigger: 'blur' }]">
-                <el-input v-model="record.secret" placeholder=""></el-input>
+                <el-input v-model="record.secret" placeholder="3f79d3fc-46870303-8957f125-f0102"></el-input>
             </el-form-item>
             <el-form-item label="最低成交标准">
                 <el-input placeholder="最低价格的数量小于这个值时最低价格卖出" v-model.number="record.numPrice.bot" style="width: 100%;" ></el-input>
@@ -137,8 +137,8 @@ export default {
         fun: "huobipro",
         funs: [],
         symbol: "OCN/ETH",
-        apiKey: "",
-        secret: "",
+        apiKey: "183a2ec2-b575e97b-1b7b059c-c2443",
+        secret: "42a3edba-64cd725a-0eeffc05-1cd10",
         // apiKey: "youur  apikey",
         // secret: "youur  secret",
         numPrice: {

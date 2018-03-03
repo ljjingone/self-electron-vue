@@ -24,7 +24,6 @@ export default class Bot {
       'apiKey': this.apiKey,
       'secret': this.secret
     });
-
     this.count = 1;
     this.orders = [];
     this.running = false;
@@ -32,6 +31,7 @@ export default class Bot {
     this.tradeTimmer = null;
     this.sellamount=0;
     this.buyamount=0;
+   
   }
 
   /**
@@ -293,7 +293,7 @@ async makeRandomOrderBot(bidNarrowVolume, askNarrowVolume, narrowWaitTime, maxVo
         'trading_agreement': 'agree'
       });
       this.buyamount += Number(volume);
-      this.createWindow.send('log', `买入挂单成功：价格：${price};数量：${volume};累计买入: ${this.buyamount}`);
+      this.createWindow.send('log', `买入挂单成功：价格：${price};数量：${volume};`);
       this.createWindow.send('buyAmount', this.buyamount)
       this.orders.push(order["id"])
     } catch (e) {
@@ -308,7 +308,7 @@ async makeRandomOrderBot(bidNarrowVolume, askNarrowVolume, narrowWaitTime, maxVo
         'trading_agreement': 'agree'
       });
       this.sellamount += Number(volume) ;
-      this.createWindow.send('log', `卖出挂单成功：价格：${price};数量：${volume};累计卖出: ${this.sellamount}`)
+      this.createWindow.send('log', `卖出挂单成功：价格：${price};数量：${volume};`)
       this.createWindow.send('sellAmount', this.sellamount)
       this.orders.push(order["id"])
 
