@@ -200,9 +200,6 @@ export default {
     });
   },
   methods: {
-    huoqu(){
-
-    },
     onSubmit() {
       let params = {
         constructorParams: {
