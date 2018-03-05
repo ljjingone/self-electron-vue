@@ -77,10 +77,10 @@
                 <el-input v-model="record.symbol" placeholder="OCN/ETH"  ></el-input>
             </el-form-item>
             <el-form-item label="apiKey" prop="apiKey"  :rules="[{ required: true, trigger: 'blur' }]">  
-                <el-input v-model="record.apiKey" placeholder="88186d8e-969cf6a0-e652f8dd-c7a68"></el-input>
+                <el-input v-model="record.apiKey" placeholder=""></el-input>
             </el-form-item>
              <el-form-item label="secret" prop="secret"  :rules="[{ required: true, trigger: 'blur' }]">
-                <el-input v-model="record.secret" placeholder="3f79d3fc-46870303-8957f125-f0102"></el-input>
+                <el-input v-model="record.secret" placeholder=""></el-input>
             </el-form-item>
             <el-form-item label="最低成交标准">
                 <el-input placeholder="最低价格的数量小于这个值时最低价格卖出" v-model.number="record.numPrice.bot" style="width: 100%;" ></el-input>
@@ -137,8 +137,8 @@ export default {
         fun: "huobipro",
         funs: [],
         symbol: "OCN/ETH",
-        apiKey: "183a2ec2-b575e97b-1b7b059c-c2443",
-        secret: "42a3edba-64cd725a-0eeffc05-1cd10",
+        apiKey: "",
+        secret: "",
         // apiKey: "youur  apikey",
         // secret: "youur  secret",
         numPrice: {
@@ -151,151 +151,141 @@ export default {
           top: 3
         },
         spacetime: 6,
-        spacePrice:0.00000002
+        spacePrice: 0.00000002
       },
       dialogVisible: false,
-      run:"",
-      sellAmount:"",
-      buyAmount:""
+      run: "",
+      sellAmount: "",
+      buyAmount: ""
     };
   },
-  created() {
-    
-  },
+  created() {},
   mounted() {
-
-   
     //监听log事件
-    
+
     this.$electron.ipcRenderer.on("log", (event, arg) => {
-        var _top1 = this.$refs.state1.scrollTop;
-    //   console.log(arg);
+      var _top1 = this.$refs.state1.scrollTop;
+      //   console.log(arg);
       this.$refs.state1.scrollTop = this.record.funs.length * 100 + 200;
       this.record.funs.push({ text: arg, log: true });
-      if(this.record.funs.length>40){
-          this.record.funs.shift()
-          console.log(this.record.funs.length)
+      if (this.record.funs.length > 40) {
+        this.record.funs.shift();
+        console.log(this.record.funs.length);
       }
     });
     this.$electron.ipcRenderer.on("error", (event, arg) => {
-        var _top1 = this.$refs.state1.scrollTop;
-    //   console.error(arg);
+      var _top1 = this.$refs.state1.scrollTop;
+      //   console.error(arg);
       this.$refs.state1.scrollTop = this.record.funs.length * 100 + 200;
       this.record.funs.push({ text: arg, log: false });
-      if(this.record.funs.length>40){
-          this.record.funs.shift()
-          console.log(this.record.funs.length)
+      if (this.record.funs.length > 40) {
+        this.record.funs.shift();
+        console.log(this.record.funs.length);
       }
     });
-     this.$electron.ipcRenderer.on("run", (event, arg) => {
-       this.run=arg;
-       
+    this.$electron.ipcRenderer.on("run", (event, arg) => {
+      this.run = arg;
     });
     this.$electron.ipcRenderer.on("sellAmount", (event, arg) => {
-       this.sellAmount=arg.toFixed(2);
-       
+      this.sellAmount = arg.toFixed(2);
     });
     this.$electron.ipcRenderer.on("sellAmount", (event, arg) => {
-       this.buyAmount=arg.toFixed(2);   
+      this.buyAmount = arg.toFixed(2);
     });
   },
   methods: {
     onSubmit() {
       let params = {
         constructorParams: {
-          fun:this.record.fun,
-          symbol:this.record.symbol,
+          fun: this.record.fun,
+          symbol: this.record.symbol,
           apiKey: this.record.apiKey,
           secret: this.record.secret
         },
         randomParams: [
           this.record.numPrice.bot,
-         this.record.numPrice.top,
-           this.record.spacetime,
-         this.record.amount.top,
+          this.record.numPrice.top,
+          this.record.spacetime,
+          this.record.amount.top,
           this.record.amount.bot,
           this.record.spacePrice
         ]
       };
       console.log(this.record, "上行");
-      if(this.record.fun){
+      if (this.record.fun) {
         //   console.log(this.run)
-          if(this.run){
-              alert("程序正在运行")
-          }else{
-                 this.$electron.ipcRenderer.send("top", params);
-          }
-         
-      }else{
-          alert("请选择交易平台")
+        if (this.run) {
+          alert("程序正在运行");
+        } else {
+          this.$electron.ipcRenderer.send("top", params);
+        }
+      } else {
+        alert("请选择交易平台");
       }
     },
     onSubmit1() {
-     let params = {
+      let params = {
         constructorParams: {
-          fun:this.record.fun,
-          symbol:this.record.symbol,
+          fun: this.record.fun,
+          symbol: this.record.symbol,
           apiKey: this.record.apiKey,
           secret: this.record.secret
         },
-         randomParams: [
+        randomParams: [
           this.record.numPrice.bot,
-         this.record.numPrice.top,
-           this.record.spacetime,
-         this.record.amount.top,
+          this.record.numPrice.top,
+          this.record.spacetime,
+          this.record.amount.top,
           this.record.amount.bot,
           this.record.spacePrice
         ]
       };
       console.log(this.record, "下行");
-      if(this.record.fun){
+      if (this.record.fun) {
         //   console.log(this.run)
-          if(this.run){
-              alert("程序正在运行")
-          }else{
-                 this.$electron.ipcRenderer.send("bot", params);
-          }
-         
-      }else{
-          alert("请选择交易平台")
+        if (this.run) {
+          alert("程序正在运行");
+        } else {
+          this.$electron.ipcRenderer.send("bot", params);
+        }
+      } else {
+        alert("请选择交易平台");
       }
     },
     onSubmit2() {
       let params = {
         constructorParams: {
-          fun:this.record.fun,
-          symbol:this.record.symbol,
+          fun: this.record.fun,
+          symbol: this.record.symbol,
           apiKey: this.record.apiKey,
           secret: this.record.secret
         },
-         randomParams: [
+        randomParams: [
           this.record.numPrice.bot,
-         this.record.numPrice.top,
-           this.record.spacetime,
-         this.record.amount.top,
+          this.record.numPrice.top,
+          this.record.spacetime,
+          this.record.amount.top,
           this.record.amount.bot,
           this.record.spacePrice
         ]
       };
       console.log(this.record, "随机");
-      if(this.record.fun){
+      if (this.record.fun) {
         //   console.log(this.run)
-          if(this.run){
-              alert("程序正在运行")
-          }else{
-                 this.$electron.ipcRenderer.send("random", params);
-          }
-         
-      }else{
-          alert("请选择交易平台")
+        if (this.run) {
+          alert("程序正在运行");
+        } else {
+          this.$electron.ipcRenderer.send("random", params);
+        }
+      } else {
+        alert("请选择交易平台");
       }
-      
     },
     onSubmit3() {
       console.log("停止");
       this.$electron.ipcRenderer.send("stop");
-    //   this.record.fun = "";
-      this.run="";
+      //   this.record.fun = "";
+      this.run = "";
     },
     init() {
       console.log("click");
@@ -345,30 +335,29 @@ export default {
   padding-left: 10px;
   color: rgb(231, 22, 186);
 }
-.demo-ruleForm{
-    width: 50%;
-    float: left;
+.demo-ruleForm {
+  width: 50%;
+  float: left;
 }
-.jiaoyi{
-    box-sizing: border-box;
-    width: 50%;
-    float: left;
-    padding-left:50px; 
+.jiaoyi {
+  box-sizing: border-box;
+  width: 50%;
+  float: left;
+  padding-left: 50px;
 }
-.el-form-item{
-    margin-bottom: 10px; 
+.el-form-item {
+  margin-bottom: 10px;
 }
-h4{
-    margin: 10px;
+h4 {
+  margin: 10px;
 }
-.el-button+.el-button{
-    margin-left: 5px;
-     
+.el-button + .el-button {
+  margin-left: 5px;
 }
-.buy-sell{
-    padding-top:20px; 
-    padding-left:25px;
-    line-height: 40px; 
+.buy-sell {
+  padding-top: 20px;
+  padding-left: 25px;
+  line-height: 40px;
 }
 /* .el-button+.el-button:nth-child(4){
     margin-top:10px; 
