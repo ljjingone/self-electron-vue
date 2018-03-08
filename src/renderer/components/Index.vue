@@ -123,7 +123,7 @@
             </ul>
         </div>
             <div class="buy-sell"> 卖出数量总和：{{this.sellAmount}}<br/>
-                  买入数量总和：{{this.sellAmount}}
+                  买入数量总和：{{this.buyAmount}}
             </div>
         </div>
   </div>
@@ -189,7 +189,7 @@ export default {
     this.$electron.ipcRenderer.on("sellAmount", (event, arg) => {
       this.sellAmount = arg.toFixed(2);
     });
-    this.$electron.ipcRenderer.on("sellAmount", (event, arg) => {
+    this.$electron.ipcRenderer.on("buyAmount", (event, arg) => {
       this.buyAmount = arg.toFixed(2);
     });
   },

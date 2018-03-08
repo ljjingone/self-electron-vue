@@ -101,6 +101,7 @@ export default class Bot {
       //区间太小就不交易
       if (ask - bid < spacePrice) {
         this.createWindow.send('log', `=====区间太小,终止第${this.count}轮随机挂单======`)
+        
         this.tradeTimmer = setTimeout(() => {
           this.makeRandomOrder(bidNarrowVolume, askNarrowVolume, narrowWaitTime, maxVolume, minVolume,spacePrice);
         }, narrowWaitTime * 1000);
